@@ -112,6 +112,7 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+
       </section>
 
       {/* Property Types */}
