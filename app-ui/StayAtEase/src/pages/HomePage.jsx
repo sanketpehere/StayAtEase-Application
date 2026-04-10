@@ -101,7 +101,7 @@ export default function HomePage() {
       </section>
 
       {/* Popular Cities */}
-      <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-10">
+      <section className="max-w-7xl mx-auto -mt-[4.5rem] px-6 -mt-10 relative z-10">
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {POPULAR_CITIES.map(city => (
             <button key={city}
