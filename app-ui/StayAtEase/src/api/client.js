@@ -8,12 +8,9 @@ const api = axios.create({
 
 // Attach token if present
 api.interceptors.request.use((config) => {
-  const user = localStorage.getItem('stayatease_user')
-  if (user) {
-    try {
-      const parsed = JSON.parse(user)
-      if (parsed?.token) config.headers.Authorization = `Bearer ${parsed.token}`
-    } catch (_) {}
+  const token = localStorage.getItem('stayatease_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
@@ -23,6 +20,7 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('stayatease_user')
+      localStorage.removeItem('stayatease_token')
       window.location.href = '/auth'
     }
     return Promise.reject(err)

@@ -4,6 +4,7 @@ import { getHotelById, getHotelRoomTypes } from '../api/hotels'
 import StarRating from '../components/common/StarRating'
 import { MapPin, Clock, Users, BedDouble, Ruler, ChevronLeft, Loader2, Wifi, Car, Coffee, Dumbbell, Waves, Star } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { checkRoomAvailability } from '../api/hotels'
 
 const PLACEHOLDER_IMGS = [
   'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80',
@@ -67,8 +68,30 @@ export default function HotelDetailPage() {
     fetch()
   }, [hotelId])
 
-  const handleBook = (room) => {
+  const handleBook = async (room) => {
     if (!user) { navigate('/auth'); return }
+
+    if (!dates.checkIn || !dates.checkOut) {
+      alert('Please select check-in and check-out dates before booking.')
+      return
+    }
+
+    if (new Date(dates.checkOut) <= new Date(dates.checkIn)) {
+      alert('Check-out date must be after check-in date.')
+      return
+    }
+
+    try {
+      const res = await checkRoomAvailability(hotelId, room.roomTypeId, dates.checkIn, dates.checkOut)
+      if (!res.data.available) {
+        alert('Sorry, this room is not available for the selected dates.')
+        return
+      }
+    } catch(err) {
+      // if check fails, let booking proceed and backend will validate
+      console.log('Availability check error:', err) // ← add this
+    }
+
     const params = new URLSearchParams({
       hotelId, roomTypeId: room.roomTypeId,
       checkIn: dates.checkIn, checkOut: dates.checkOut, guests: dates.guests,
@@ -213,25 +236,19 @@ export default function HotelDetailPage() {
         <div className="lg:col-span-1">
           <div className="sticky top-24 card p-6 border border-gray-200">
             <h3 className="font-display font-bold text-brand-dark text-lg mb-5">Plan Your Stay</h3>
-            <div className="space-y-3 mb-5">
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Check-In</label>
-                <input type="date" value={dates.checkIn}
-                  onChange={e => setDates({ ...dates, checkIn: e.target.value })}
-                  className="input-field text-sm" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Check-Out</label>
-                <input type="date" value={dates.checkOut}
-                  onChange={e => setDates({ ...dates, checkOut: e.target.value })}
-                  className="input-field text-sm" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Guests</label>
-                <input type="number" min={1} max={10} value={dates.guests}
-                  onChange={e => setDates({ ...dates, guests: e.target.value })}
-                  className="input-field text-sm" />
-              </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Check-In</label>
+              <input type="date" value={dates.checkIn}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={e => setDates({ ...dates, checkIn: e.target.value })}
+                className="input-field text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Check-Out</label>
+              <input type="date" value={dates.checkOut}
+                min={dates.checkIn || new Date().toISOString().split('T')[0]}
+                onChange={e => setDates({ ...dates, checkOut: e.target.value })}
+                className="input-field text-sm" />
             </div>
 
             {selectedRoom && (

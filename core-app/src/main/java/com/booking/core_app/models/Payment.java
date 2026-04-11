@@ -2,6 +2,7 @@ package com.booking.core_app.models;
 
 import com.booking.core_app.enums.PaymentMode;
 import com.booking.core_app.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 import java.util.PriorityQueue;
 import java.util.UUID;
 
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Data
 @AllArgsConstructor

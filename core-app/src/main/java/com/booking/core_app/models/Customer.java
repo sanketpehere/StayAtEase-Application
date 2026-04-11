@@ -3,9 +3,10 @@ package com.booking.core_app.models;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "customers")
 @AllArgsConstructor

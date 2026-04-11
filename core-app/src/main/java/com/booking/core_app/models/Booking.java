@@ -4,6 +4,7 @@ import com.booking.core_app.enums.BookingStatus;
 import com.booking.core_app.enums.BookingType;
 import com.booking.core_app.enums.PaymentMode;
 import com.booking.core_app.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +38,9 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private Payment payment;
+
     //Stay details
     @Column(nullable = false)
     private LocalDate startDate;
@@ -55,9 +59,6 @@ public class Booking {
 
     //coupon
     private String discountCouponCode;
-
-    @OneToOne
-    private Payment payment;
 
     @Enumerated(EnumType.STRING)
     private BookingType bookingType;

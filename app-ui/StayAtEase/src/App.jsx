@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/common/Navbar'
 import Footer from './components/common/Footer'
 import ProtectedRoute from './components/common/ProtectedRoute'
+import OwnerProtectedRoute from './components/common/OwnerProtectedRoute'
 
 // Pages
 import HomePage from './pages/HomePage'
@@ -15,8 +16,9 @@ import HotelDetailPage from './pages/HotelDetailPage'
 import BookingPage from './pages/BookingPage'
 import DashboardPage from './pages/DashboardPage'
 import NotFoundPage from './pages/NotFoundPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
+import OwnerDashboardPage from './pages/owner/OwnerDashboardPage'
 
-// Layout wrapper — shows Navbar/Footer on all pages except auth
 function Layout({ children, hideFooter }) {
   return (
     <>
@@ -35,12 +37,15 @@ export default function App() {
           {/* Auth — no navbar/footer */}
           <Route path="/auth" element={<AuthPage />} />
 
+          {/* Email verification */}
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+
           {/* Public routes */}
           <Route path="/" element={<Layout><HomePage /></Layout>} />
           <Route path="/hotels" element={<Layout><HotelsPage /></Layout>} />
           <Route path="/hotels/:hotelId" element={<Layout><HotelDetailPage /></Layout>} />
 
-          {/* Protected routes */}
+          {/* Customer protected routes */}
           <Route path="/booking" element={
             <Layout hideFooter>
               <ProtectedRoute><BookingPage /></ProtectedRoute>
@@ -55,6 +60,11 @@ export default function App() {
             <Layout>
               <ProtectedRoute><DashboardPage /></ProtectedRoute>
             </Layout>
+          } />
+
+          {/* Owner protected routes */}
+          <Route path="/owner/dashboard" element={
+            <OwnerProtectedRoute><OwnerDashboardPage /></OwnerProtectedRoute>
           } />
 
           {/* 404 */}
