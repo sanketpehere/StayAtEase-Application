@@ -29,8 +29,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/hotels/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/error",
+                                "/actuator/**",
+                                "/api/v1/auth/**",
+                                "/api/v1/hotels/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
