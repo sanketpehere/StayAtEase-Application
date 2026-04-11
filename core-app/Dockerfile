@@ -1,11 +1,20 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean install -DskipTests
+# Use official Java image
+FROM eclipse-temurin:17-jdk
 
-FROM eclipse-temurin:21-jre-alpine
+# Set working directory
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Copy project files
+COPY . .
+
+# Give permission to mvnw
+RUN chmod +x mvnw
+
+# Build application
+RUN ./mvnw clean package -DskipTests
+
+# Expose Spring Boot port
+EXPOSE 7803
+
+# Run application
+CMD ["java", "-jar", "target/core-app-0.0.1-SNAPSHOT.jar"]
