@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

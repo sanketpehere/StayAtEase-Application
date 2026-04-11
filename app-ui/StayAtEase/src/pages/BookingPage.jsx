@@ -4,7 +4,6 @@ import { createBooking } from '../api/bookings'
 import { useAuth } from '../context/AuthContext'
 import { CreditCard, Smartphone, Globe, Wallet, CheckCircle2, Loader2, ChevronLeft, Shield } from 'lucide-react'
 
-// Matches your PaymentMode enum: CARD, UPI, NET_BANKING, WALLET
 const PAYMENT_MODES = [
   { value: 'CARD', label: 'Credit / Debit Card', icon: <CreditCard size={18} />, desc: 'Visa, Mastercard, RuPay' },
   { value: 'UPI', label: 'UPI', icon: <Smartphone size={18} />, desc: 'GPay, PhonePe, Paytm' },
@@ -12,7 +11,6 @@ const PAYMENT_MODES = [
   { value: 'WALLET', label: 'Wallet', icon: <Wallet size={18} />, desc: 'Paytm, Amazon Pay' },
 ]
 
-// Matches your BookingType enum: ONLINE, WALK_IN, CORPORATE
 const BOOKING_TYPE = 'ONLINE'
 
 export default function BookingPage() {
@@ -26,7 +24,7 @@ export default function BookingPage() {
   const checkOut = searchParams.get('checkOut')
   const guests = searchParams.get('guests') || 1
 
-  const [step, setStep] = useState(1) // 1=details, 2=payment, 3=success
+  const [step, setStep] = useState(1)
   const [paymentMode, setPaymentMode] = useState('UPI')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -41,7 +39,6 @@ export default function BookingPage() {
     specialRequests: '',
   })
 
-  // Mock pricing (replace with actual room data passed via state or another API call)
   const baseAmount = 7225
   const taxRate = 0.18
   const discount = couponApplied ? 500 : 0
@@ -69,9 +66,7 @@ export default function BookingPage() {
       setBookingResult(res.data)
       setStep(3)
     } catch (err) {
-      // Mock success for UI demo
-      setBookingResult({ bookingId: 'BK-' + Math.random().toString(36).slice(2, 8).toUpperCase(), bookingStatus: 'CONFIRMED' })
-      setStep(3)
+      setError(err.response?.data?.message || 'Booking failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -126,7 +121,6 @@ export default function BookingPage() {
 
         <h1 className="font-display text-3xl font-bold text-brand-dark mb-8">Complete Your Booking</h1>
 
-        {/* Steps indicator */}
         <div className="flex items-center gap-3 mb-10">
           {['Guest Details', 'Payment'].map((label, i) => (
             <React.Fragment key={label}>
@@ -142,7 +136,6 @@ export default function BookingPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main form */}
           <div className="lg:col-span-2">
             {step === 1 && (
               <div className="card p-8 animate-fade-up">
@@ -186,7 +179,9 @@ export default function BookingPage() {
                 <h2 className="font-display font-bold text-xl text-brand-dark mb-6">Payment Method</h2>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-5">{error}</div>
+                  <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-5">
+                    {error}
+                  </div>
                 )}
 
                 <div className="space-y-3 mb-6">
@@ -221,7 +216,6 @@ export default function BookingPage() {
             )}
           </div>
 
-          {/* Booking Summary */}
           <div className="lg:col-span-1">
             <div className="card p-6 border border-gray-200 sticky top-24">
               <h3 className="font-display font-bold text-brand-dark mb-5">Booking Summary</h3>
@@ -251,7 +245,6 @@ export default function BookingPage() {
                 </div>
               </div>
 
-              {/* Coupon */}
               <div className="mb-4">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Coupon Code</label>
                 <div className="flex gap-2">

@@ -1,5 +1,7 @@
 package com.booking.core_app.models;
 
+import com.booking.core_app.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Inheritance(strategy = InheritanceType.JOINED) //
 @Entity
 @AllArgsConstructor
@@ -39,6 +43,8 @@ public class User {
 
     private String provider;
 
+    private String verificationToken;
+
     private LocalDateTime createdAt;
 
 
@@ -47,6 +53,9 @@ public class User {
     private String createdBy;
 
     private String updatedBy;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public UUID getId() {
         return id;
@@ -152,4 +161,11 @@ public class User {
         this.updatedBy = updatedBy;
     }
 
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
 }

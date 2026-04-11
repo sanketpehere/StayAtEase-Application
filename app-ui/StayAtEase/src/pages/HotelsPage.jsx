@@ -58,11 +58,7 @@ export default function HotelsPage() {
         const res = await searchHotels(Object.fromEntries(searchParams.entries()))
         setHotels(res.data)
       } catch {
-        // Use mock data when backend isn't ready
-        let filtered = [...MOCK_HOTELS]
-        if (filters.city) filtered = filtered.filter(h => h.city.toLowerCase().includes(filters.city.toLowerCase()))
-        if (filters.type) filtered = filtered.filter(h => h.hotelType === filters.type)
-        setHotels(filtered)
+        setHotels([])
       } finally {
         setLoading(false)
       }
@@ -249,7 +245,7 @@ export default function HotelsPage() {
                           <span className="text-xs text-gray-400 line-through block">₹{hotel.basePrice?.toLocaleString()}</span>
                         )}
                         <span className="text-xl font-display font-bold text-brand-dark">
-                          ₹{(hotel.finalPrice || hotel.basePrice)?.toLocaleString()}
+                          ₹{hotel.startingPrice?.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400"> /night</span>
                       </div>
