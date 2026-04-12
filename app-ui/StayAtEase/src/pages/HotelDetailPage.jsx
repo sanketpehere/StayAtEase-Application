@@ -262,8 +262,9 @@ export default function HotelDetailPage() {
             <button
               onClick={() => selectedRoom ? handleBook(selectedRoom) : null}
               disabled={!selectedRoom}
-              className={`w-full font-semibold py-3.5 rounded-xl transition-all ${selectedRoom ? 'btn-primary' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+              className={`w-full font-semibold py-3.5 rounded-xl transition-all mt-3 ${selectedRoom ? 'btn-primary' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
             >
+
               {selectedRoom ? 'Continue to Booking' : 'Select a Room Type'}
             </button>
 
