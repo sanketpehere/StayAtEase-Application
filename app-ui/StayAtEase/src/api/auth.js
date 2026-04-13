@@ -4,7 +4,7 @@ import api from './client'
 export const signup = (data) =>
   api.post('/auth/ui/signup', data, {
     // Signup can take longer in staging because SMTP delivery is synchronous.
-    timeout: 5000,
+    timeout: 30000,
   })
 
 // POST /api/v1/auth/ui/login  → { email, password }

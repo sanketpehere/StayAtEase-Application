@@ -72,7 +72,11 @@ export default function AuthPage() {
         setEmailSent(true)
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.')
+      if (err.code === 'ECONNABORTED' || err.code === 'ERR_CANCELED') {
+        setError('Signup request timed out. Please try again in a few seconds.')
+      } else {
+        setError(err.response?.data?.message || 'Signup failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
