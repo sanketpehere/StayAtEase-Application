@@ -18,8 +18,11 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Value("${app.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
+
     public void sendVerificationEmail(String toEmail, String token) {
-        String verificationLink = "http://localhost:3000/verify-email?token=" + token;
+        String verificationLink = frontendUrl + "/verify-email?token=" + token;
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -44,7 +47,10 @@ public class EmailService {
             mailSender.send(message);
 
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send verification email: " + e.getMessage());
+            throw new RuntimeException("Failed to compose verification email: " + e.getMessage(), e);
+        } catch (Exception e) {
+            String rootCause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+            throw new RuntimeException("Failed to send verification email. SMTP error: " + rootCause, e);
         }
     }
 }

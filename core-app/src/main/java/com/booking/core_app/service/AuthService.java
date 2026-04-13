@@ -7,6 +7,7 @@ import com.booking.core_app.requestDto.CustomerSignupDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -57,9 +58,25 @@ public class AuthService {
         return new AuthResponse(token, saved, Role.CUSTOMER);
     }
 
+    @Transactional
     public AuthResponse signup(CustomerSignupDto customerSignupDto) {
-        if (customerService.findByEmail(customerSignupDto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered.");
+        Optional<Customer> existingCustomer = customerService.findByEmail(customerSignupDto.getEmail());
+        if (existingCustomer.isPresent()) {
+            Customer existing = existingCustomer.get();
+
+            if (existing.isVerified()) {
+                throw new RuntimeException("Email already registered.");
+            }
+
+            // If account exists but is still unverified, rotate token and resend verification mail.
+            String verificationToken = UUID.randomUUID().toString();
+            existing.setVerificationToken(verificationToken);
+            existing.setUpdatedAt(LocalDateTime.now());
+            existing.setUpdatedBy("System");
+            Customer savedExisting = customerService.saveCustomer(existing);
+
+            emailService.sendVerificationEmail(savedExisting.getEmail(), verificationToken);
+            return new AuthResponse(null, savedExisting, Role.CUSTOMER);
         }
 
         Customer customer = new Customer();
