@@ -184,9 +184,3 @@ cd core-app
 - Improve email templates and verification UX
 - Add unit/integration tests for frontend and backend
 - Support search filters by dates, guests, and room amenities
-
-## Notes
-
-- The frontend is designed to point at a backend API base URL via `VITE_API_BASE_URL`.
-- The backend is designed to run statelessly using JWT and relies on PostgreSQL and SMTP credentials.
-- Keep production secrets out of source control and use environment-specific config for staging and production.
