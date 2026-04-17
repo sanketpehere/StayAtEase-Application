@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { searchHotels } from '../api/hotels'
 import StarRating from '../components/common/StarRating'
@@ -82,6 +82,48 @@ export default function HotelsPage() {
   }
 
   const activeFilters = Object.entries(filters).filter(([, v]) => v)
+
+  const displayedHotels = useMemo(() => {
+    const cityQuery = filters.city.trim().toLowerCase()
+    const selectedType = filters.type.trim().toLowerCase()
+    const minPrice = filters.minPrice === '' ? null : Number(filters.minPrice)
+    const maxPrice = filters.maxPrice === '' ? null : Number(filters.maxPrice)
+    const minRating = filters.minRating === '' ? null : Number(filters.minRating)
+
+    const filtered = hotels.filter((hotel) => {
+      const hotelName = (hotel.hotelName || '').toLowerCase()
+      const hotelCity = (hotel.city || '').toLowerCase()
+      const hotelType = (hotel.hotelType || '').toLowerCase()
+      const hotelRating = Number(hotel.avgRating || 0)
+      const hotelPrice = Number(hotel.startingPrice ?? hotel.finalPrice ?? hotel.basePrice ?? 0)
+
+      if (cityQuery && !hotelCity.includes(cityQuery) && !hotelName.includes(cityQuery)) return false
+      if (selectedType && hotelType !== selectedType) return false
+      if (minPrice !== null && hotelPrice < minPrice) return false
+      if (maxPrice !== null && hotelPrice > maxPrice) return false
+      if (minRating !== null && hotelRating < minRating) return false
+
+      return true
+    })
+
+    if (sortBy === 'price_asc') {
+      filtered.sort(
+        (a, b) =>
+          Number(a.startingPrice ?? a.finalPrice ?? a.basePrice ?? 0) -
+          Number(b.startingPrice ?? b.finalPrice ?? b.basePrice ?? 0)
+      )
+    } else if (sortBy === 'price_desc') {
+      filtered.sort(
+        (a, b) =>
+          Number(b.startingPrice ?? b.finalPrice ?? b.basePrice ?? 0) -
+          Number(a.startingPrice ?? a.finalPrice ?? a.basePrice ?? 0)
+      )
+    } else if (sortBy === 'rating') {
+      filtered.sort((a, b) => Number(b.avgRating ?? 0) - Number(a.avgRating ?? 0))
+    }
+
+    return filtered
+  }, [hotels, filters, sortBy])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -192,7 +234,7 @@ export default function HotelsPage() {
           <div className="flex items-center justify-center py-24">
             <Loader2 size={32} className="animate-spin text-brand-red" />
           </div>
-        ) : hotels.length === 0 ? (
+        ) : displayedHotels.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-5xl mb-4">🏨</div>
             <h3 className="font-display text-xl font-bold text-brand-dark mb-2">No hotels found</h3>
@@ -200,9 +242,9 @@ export default function HotelsPage() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-gray-500 mb-6 font-medium">{hotels.length} properties found</p>
+            <p className="text-sm text-gray-500 mb-6 font-medium">{displayedHotels.length} properties found</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {hotels.map((hotel, idx) => (
+              {displayedHotels.map((hotel, idx) => (
                 <div key={hotel.hotelId}
                   onClick={() => navigate(`/hotels/${hotel.hotelId}`)}
                   className="card cursor-pointer overflow-hidden group animate-fade-up"

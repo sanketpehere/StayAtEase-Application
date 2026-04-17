@@ -95,6 +95,8 @@ export default function HotelDetailPage() {
     const params = new URLSearchParams({
       hotelId, roomTypeId: room.roomTypeId,
       checkIn: dates.checkIn, checkOut: dates.checkOut, guests: dates.guests,
+      roomPrice: room.finalPrice,
+      roomTypeName: room.roomTypeName,
     })
     navigate(`/booking?${params.toString()}`)
   }

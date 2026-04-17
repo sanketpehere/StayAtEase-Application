@@ -20,6 +20,8 @@ export default function BookingPage() {
 
   const hotelId = searchParams.get('hotelId')
   const roomTypeId = searchParams.get('roomTypeId')
+  const roomTypeName = searchParams.get('roomTypeName') || 'Selected Room'
+  const roomPriceParam = Number(searchParams.get('roomPrice'))
   const checkIn = searchParams.get('checkIn')
   const checkOut = searchParams.get('checkOut')
   const guests = searchParams.get('guests') || 1
@@ -39,7 +41,7 @@ export default function BookingPage() {
     specialRequests: '',
   })
 
-  const baseAmount = 7225
+  const baseAmount = Number.isFinite(roomPriceParam) && roomPriceParam > 0 ? roomPriceParam : 0
   const taxRate = 0.18
   const discount = couponApplied ? 500 : 0
   const taxAmount = Math.round((baseAmount - discount) * taxRate)
@@ -48,6 +50,10 @@ export default function BookingPage() {
   const nights = checkIn && checkOut
     ? Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)))
     : 1
+  const totalBaseAmount = baseAmount * nights
+  const totalDiscountAmount = discount * nights
+  const totalTaxAmount = taxAmount * nights
+  const totalFinalAmount = finalAmount * nights
 
   const handleConfirmBooking = async () => {
     setLoading(true)
@@ -57,7 +63,10 @@ export default function BookingPage() {
         hotelId, roomTypeId,
         startDate: checkIn, endDate: checkOut,
         numberOfRooms: 1, totalGuests: Number(guests),
-        baseAmount, discountAmount: discount, taxAmount, finalAmount,
+        baseAmount: totalBaseAmount,
+        discountAmount: totalDiscountAmount,
+        taxAmount: totalTaxAmount,
+        finalAmount: totalFinalAmount,
         discountCouponCode: couponApplied ? coupon : null,
         bookingType: BOOKING_TYPE,
         paymentMode,
@@ -100,7 +109,7 @@ export default function BookingPage() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Amount Paid</span>
-            <span className="font-bold text-brand-dark">₹{(finalAmount * nights).toLocaleString()}</span>
+            <span className="font-bold text-brand-dark">₹{totalFinalAmount.toLocaleString()}</span>
           </div>
         </div>
 
@@ -209,7 +218,7 @@ export default function BookingPage() {
                   <button onClick={handleConfirmBooking} disabled={loading}
                     className="btn-primary flex-1 py-3.5 text-sm flex items-center justify-center gap-2">
                     {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                    Pay ₹{(finalAmount * nights).toLocaleString()}
+                    Pay ₹{totalFinalAmount.toLocaleString()}
                   </button>
                 </div>
               </div>
@@ -220,6 +229,10 @@ export default function BookingPage() {
             <div className="card p-6 border border-gray-200 sticky top-24">
               <h3 className="font-display font-bold text-brand-dark mb-5">Booking Summary</h3>
               <div className="space-y-3 text-sm mb-5">
+                <div className="flex justify-between text-gray-600">
+                  <span>Room Type</span>
+                  <span className="font-medium text-brand-dark">{roomTypeName}</span>
+                </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Room / night</span>
                   <span className="font-medium text-brand-dark">₹{baseAmount.toLocaleString()}</span>
@@ -236,12 +249,12 @@ export default function BookingPage() {
                 )}
                 <div className="flex justify-between text-gray-600">
                   <span>GST (18%)</span>
-                  <span className="font-medium text-brand-dark">₹{(taxAmount * nights).toLocaleString()}</span>
+                  <span className="font-medium text-brand-dark">₹{totalTaxAmount.toLocaleString()}</span>
                 </div>
                 <div className="h-px bg-gray-100" />
                 <div className="flex justify-between font-bold text-brand-dark text-base">
                   <span>Total</span>
-                  <span>₹{(finalAmount * nights).toLocaleString()}</span>
+                  <span>₹{totalFinalAmount.toLocaleString()}</span>
                 </div>
               </div>
 
